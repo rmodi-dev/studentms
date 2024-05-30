@@ -7,8 +7,6 @@ module.exports =(sequelize_config, Sequelize) => {
         class:{type:Sequelize.STRING},
         physical_address:{type:Sequelize.STRING},
         status:{type:Sequelize.BOOLEAN},
-        
     });
-
     return student;
 }
