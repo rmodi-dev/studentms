@@ -3,6 +3,7 @@
 const express = require("express");
 // helps to parse the reques and creatr the req.body object
 const bodyParser = require("body-parser");
+const morgan = require('morgan'); //Loggings
 
 const app =express()
 // Parse requests of content-type -application/json
@@ -13,6 +14,7 @@ const db = require("./models");
 db.sequelize_config.sync();
 //parse requests of content type - application/x-www-form
 app.use(bodyParser.urlencoded({ extended: true}));
+app.use(morgan('dev'));
 // setting port number for the backend
 //simple route
 app.get("/",(req, res)=>{
