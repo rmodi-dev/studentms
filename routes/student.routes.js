@@ -5,17 +5,14 @@ module.exports = app => {
     //Importing router interface from express module
     let router = require("express").Router();
 
-    //Route to get all students in our database
+    //Routes
     router.get("/r", student_controller.GetAllStudents);
-
-    //Defining API Root URL
     router.put("/update/:id", student_controller.UpdateStudent);
-
-    router.get("/findstudent", student_controller.GetStudentByIdPost);
-
+    router.get("/find/:id", student_controller.GetStudentByID);
+    router.post("/findbyid", student_controller.FindStudentById);
     router.post("/create", student_controller.CreateStudent);
-
-    router.delete("/delete", student_controller.DeleteStudent);
+    router.delete("/delete", student_controller.DeleteStudentSQL);
+    router.get("/search", student_controller.SearchStudent);
 
     //Defining API Root URL
     app.use('/api/students', router);

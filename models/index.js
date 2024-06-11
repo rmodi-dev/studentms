@@ -1,5 +1,4 @@
-// import dbConfig
-const dbConfig = require("../config/db.config.js");
+const dbConfig = require("../config/db.config.js"); // import DB Config
 
 const Sequelize = require("sequelize");
 const sequelize_config = new Sequelize(
@@ -13,12 +12,12 @@ const sequelize_config = new Sequelize(
             acquire: dbConfig.pool.acquire,
             idle: dbConfig.pool.idle,
         }
-     }
+    }
 );
 
 sequelize_config.authenticate().then(() => {
     console.log('Connection has been established successfully.');
-    }).catch( (error) => {
+}).catch( (error) => {
     console.error('Unable to connect to the database: ', error);
 });
 
@@ -27,4 +26,10 @@ db.Sequelize = Sequelize;
 db.sequelize_config = sequelize_config;
 
 db.students = require("./student.model.js")(sequelize_config, Sequelize);
+db.studentfees = require("./studentfees.model.js")(sequelize_config, Sequelize);
+db.students.hasMany(db.studentfees, {FOREIGNKEY: "id" });
+
+db.feespayments = require("./feespayments.model.js")(sequelize_config, Sequelize);
+db.studentfees.hasMany(db.feespayments, {FOREIGNKEY: "id" });
+
 module.exports = db;

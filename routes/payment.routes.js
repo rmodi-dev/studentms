@@ -5,12 +5,11 @@ module.exports = app => {
     //Importing router interface from express module
     let router = require("express").Router();    
 
-    //Defining API Route URLs
-    router.post("/register", payment_controller.RegisterPayment);
-    router.get("/search", payment_controller.SearchPayments);
-    router.put("/update/:id", payment_controller.UpdatePayment);
-    router.get("/find", payment_controller.FindPaymentById);
-    router.delete("/delete", payment_controller.DeletePayment);
+    //Defining '/api/payments' API Routes URLs
+    router.post("/register_fees_payment", payment_controller.RegisterPayment);
+    router.get("/search_fees", payment_controller.SearchPayments);
+    router.get("/fees_balances", payment_controller.ListFeesBalances);
+    router.get("/fees_totals", payment_controller.TotalFeesInPeriod);
 
     //Defining API Root URL
     app.use('/api/payments', router);
