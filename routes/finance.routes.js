@@ -7,7 +7,7 @@ module.exports = app => {
 
     //Defining '/api/payments' API Routes URLs
     router.post("/register_fees_payment", payment_controller.RegisterPayment);
-    router.get("/search_fees", payment_controller.SearchPayments);
+    router.get("/search_fees_in_range", payment_controller.SearchPayments);
     router.get("/fees_balances", payment_controller.ListFeesBalances);
     router.get("/fees_totals", payment_controller.TotalFeesInPeriod);
 

@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const morgan = require('morgan'); //Logging API CRUD operations
 
 const app = express();
-const PORT = 8080; // setting port number for the backend
+const PORT = 8097; // setting port number for the backend
 
 app.use(bodyParser.json()); // Parse requests of content-type -application/json
 app.use(bodyParser.urlencoded({ extended: true})); //parse requests of content type - application/x-www-form
@@ -17,7 +17,7 @@ app.use(express.json());
 const db = require("./models"); 
 // import routes
 require("./routes/student.routes")(app);
-require("./routes/payment.routes")(app);
+require("./routes/finance.routes")(app);
 
 
 db.sequelize_config.sync( {force: false} ).then(()=>{ console.log("DB re-synched") }); //synchronise or purge the database
