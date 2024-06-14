@@ -11,9 +11,10 @@ module.exports = app => {
     router.get("/find/:id", student_controller.GetStudentByID);
     router.post("/findbyid", student_controller.FindStudentById);
     router.post("/create", student_controller.CreateStudent);
-    router.delete("/delete", student_controller.DeleteStudentSQL);
+    router.delete("/delete", student_controller.DeleteStudent);
+    router.delete("/delete_student", student_controller.DeleteStudentSQL);
     router.get("/search", student_controller.SearchStudent);
-    router.get("/find_by_class", student_controller.FindStudentsInClass);
+    router.post("/find_by_class", student_controller.FindStudentsInClass);
 
     //Defining API Root URL
     app.use('/api/students', router);

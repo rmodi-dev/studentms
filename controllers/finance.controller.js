@@ -8,8 +8,6 @@ const Feespayment = db.feespayments;
 
 //define operator
 const Op = db.Sequelize.Op;
-//const fn = db.Sequelize.fn;
-//const col = db.Sequelize.col;
 
 // retreive student fees within specified amount range
 exports.SearchPayments = async(req, res) => {
@@ -152,7 +150,7 @@ exports.ListFeesBalances = async (req, res) => {
     });
 };
 
-// retreive student fees within a specified date range
+// retreive total fees and student details for pyaments within a specified date range
 exports.TotalFeesInPeriod = async (req, res) => {
     const { startDate, endDate } = req.body;
     Student.findAll({
@@ -163,7 +161,6 @@ exports.TotalFeesInPeriod = async (req, res) => {
             include: {
                 model: Feespayment,
                 attributes: ['amount_paid', 'date_paid'],
- //               include: [[fn('SUM', col('amount_paid')), 'total_amount_paid']],
                 where: { date_paid: { [Op.between]: [startDate, endDate] } },
             }
         }
@@ -200,7 +197,7 @@ exports.TotalFeesInPeriod = async (req, res) => {
             students_details: { ...fees_payments }
         });
     }).catch(err => {
-        res.status(500).send({ message: err.message || `Error while retrieving fees paid between \
+        res.status(500).send({ message: err.message || `Error while retrieving fees payments between \
             ${ startDate } and ${ endDate }.` });
     });
 };

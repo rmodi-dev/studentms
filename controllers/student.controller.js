@@ -1,4 +1,4 @@
-//importing models
+//importing models and modules
 const db = require("../models");
 
 //returning students
@@ -101,39 +101,40 @@ exports.FindStudentById = async(req, res) => {
 
 // Create a student
 exports.CreateStudent = async(req, res) => {
+    const { first_name, last_name, class: student_class, gender,
+         physical_address, school_fees, status } = req.body;
     let msg="";
 
-    if (!req.body.first_name){ msg = msg + "First name is required. " }
-    if (!req.body.last_name){ msg = msg + "Last name is required. " }
-    if (!req.body.gender){ msg = msg + "Gender is required." }
-    if ((req.body.gender != 'F') && (req.body.gender != 'M')){ 
+    if (!first_name){ msg = msg + "First name is required. " }
+    if (!last_name){ msg = msg + "Last name is required. " }
+    if (!gender){ msg = msg + "Gender is required." }
+    if ((gender != 'F') && (gender != 'M')){ 
         msg = msg + "ONLY either F or M is allowed for Gender."
     }
-    if (!req.body.school_fees){ msg = msg + "School fees is required." }
-    if ((!req.body.first_name) && (!req.body.last_name) && (!req.body.gender) && (!req.body.school_fees)){ 
-        msg = "No information submitted. Student's first name, last name, gender and school fees are ALL required."
+    if (!school_fees){ msg = msg + "School fees is required." }
+    if ((!first_name) && (!last_name) && (!gender) && (!school_fees)){ 
+        msg = "No information submitted. Student's first name, last name, \
+        gender and school fees are ALL required."
     }
 
     if( msg!==""){
-        res.status(400).send({
-            message: `${msg}`
-        });
+        res.status(400).send({ message: `${msg}` });
         return;
     }
 
     const student_data = {
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
-        gender: req.body.gender,
-        class: req.body.class,
-        physical_address: req.body.physical_address,
-        status: req.body.status ? req.body.status : false
+        first_name: first_name,
+        last_name: last_name,
+        gender: gender,
+        class: student_class,
+        physical_address: physical_address,
+        status: status ? status : false
     }
 
     Student.create(student_data)
         .then(async data => {
-            await Studentfees.create({studentId: data.id, fees_amount: req.body.school_fees });
-            res.send({...data.dataValues, fees_amount: req.body.school_fees});
+            await Studentfees.create({studentId: data.id, fees_amount: school_fees });
+            res.send({...data.dataValues, fees_amount: school_fees});
         }
     ).catch(err => {
         res.status(500).send({
@@ -146,83 +147,37 @@ exports.CreateStudent = async(req, res) => {
 
 // Function delete a student
 exports.DeleteStudent = async(req, res) => {
-    const body_id = req.body.id;
-    const student_id = await Student.findByPk(body_id);
+    const found_student = await Student.findByPk(req.body.id);
 
-    if(student_id === null){
-        const id = student_id ? student_id : body_id;
+    if(found_student === null){
         res.status(400).send({
-            message: `No student with ID ${ id } exists in the database. No record deleted.`
+            message: `No student with ID ${ req.body.id } exists in the database. No record deleted.`
         });
         return;
     }
+    const student_id = found_student.dataValues.id;
 
-    Student.destroy({ where: { id: body_id } })
-    .then(
-        data => {
-            if(data == 1){
-                res.send({
-                    status: "Success",
-                    status_code: 100,
-                    message: "Student Deleted",
-                    result: data
-                });
-            }else{
-                res.send({
-                    status: "Error",
-                    status_code: 101,
-                    message: `Student with id ${body_id} was not found. No recorded deleted`,
-                    result: data
-                });
-            }
+    Student.destroy({ where: { id: student_id } })
+    .then( data => {
+        if(data == 1){
+            res.send({
+                status: "Success",
+                status_code: 100,
+                message: "Student Deleted",
+                result: data
+            });
+        }else{
+            res.send({
+                status: "Error",
+                status_code: 101,
+                message: `Student with id ${req.body.id} was not found. No recorded deleted`,
+                result: data
+            });
         }
-    ).catch(err => {
-        res.status(500).send({
-            status: "Internal Error",
-            status_code: 101,
-            message: err.message || "Error Occurred While deleting a student"
-        });
+    }).catch(err => {
+        res.status(500).send({ message: err.message });
     });
 };
-/*
-// Another function that deletes a student
-exports.DeleteStudentSQL = async(req, res) => {
-    const body_id = req.body.id;
-    const student_id = await Student.findByPk(body_id);
-
-    if(student_id === null){
-        const id = student_id ? student_id : body_id;
-        res.status(400).send({
-            message: `No student with ID ${ id } exists in the database. No record deleted.`
-        });
-        return;
-    }
-
-    // Results will be an empty array and metadata will contain the number of affected rows.
-    const { QueryTypes } = require("sequelize");
-    const [results, metadata] = await sequelize.query(
-        `DELETE FROM students WHERE id = ${student_id}`, {
-            type: QueryTypes.DELETE,
-          }
-    );
-
-    if(metadata == 1){
-        res.send({
-            status: "Success",
-            status_code: 100,
-            message: "Student Deleted",
-            result: metadata
-        });
-    }else{
-        res.send({
-            status: "Error",
-            status_code: 101,
-            message: `Student with id ${param_id} was not found. No recorded deleted`,
-            result: results
-        });
-    }
-};
-*/
 
 // Search Students by first name
 exports.SearchStudent = async(req, res) => {
@@ -232,61 +187,62 @@ exports.SearchStudent = async(req, res) => {
     Student.findAll({where: condition})
     .then(data => {  res.send(data) })
     .catch(err => {
-        res.status(500).send({ message: err.message || "Error while searching a student/" })
+        res.status(500).send({ message: err.message || "Error while searching a student" })
     });
 }
 
+// Deletes a student, uses SQL
 exports.DeleteStudentSQL = async(req, res) => {
-    const body_id = req.body.id;
-    const student = await Student.findByPk(body_id);
+    const found_student = await Student.findByPk(req.body.id);
 
-    if (!student) {
+    if(found_student === null){
         res.status(400).send({
-            message: `No student with ID ${body_id} exists in the database. No record deleted.`
+            message: `No student with ID ${ req.body.id } exists in the database. No record deleted.`
         });
         return;
     }
+    const student_id = found_student.dataValues.id;
 
     try {
-        const { Sequelize } = require('sequelize');
+
+        // Results will be an empty array and metadata will contain the number of affected rows.
         const { QueryTypes } = require('sequelize');
-        const [metadata] = await Sequelize.query(
-            `DELETE FROM students WHERE id = :studentId`, {
+        const [results, metadata] = await sequelize.query(
+            `DELETE FROM students WHERE id = ${student_id}`, {
                 type: QueryTypes.DELETE,
-                replacements: { studentId: body_id }
             }
         );
 
-        if(metadata > 0) {
+        if(metadata == 1){
             res.send({
                 status: "Success",
                 status_code: 100,
                 message: "Student Deleted",
                 result: metadata
             });
-        } else {
+        }else{
             res.send({
                 status: "Error",
                 status_code: 101,
-                message: `Student with id ${body_id} was not found. No record deleted`,
-                result: metadata
+                message: `Student with id ${req.body.id} was not found. No recorded deleted`,
+                result: results
             });
         }
     } catch(error) {
         console.error("Error deleting student:", error);
         res.status(500).send({
-            message: "An error occurred while deleting the student."
+            message: error
         });
     }
 };
 
 // retreive all students in a specific class
 exports.FindStudentsInClass = (req, res) => {
-    const { StudentClass } = req.body;
+    const StudentClass = req.body.student_class;
     let vmsg='';
 
     if(StudentClass === null){
-        vmsg = `No class, or invalid class specified. Please specify one of: S1, S2, S3, S4, S5 or S6.`
+        vmsg = `No class, or invalid class specified. Please specify one of: S1, S2, S3, S4, S5 or S6.`;
     }
 
     if( vmsg!==""){
@@ -295,11 +251,11 @@ exports.FindStudentsInClass = (req, res) => {
     }
 
     Student.findAll({
-        attributes: {
-            include: ['first_name', 'last_name']
-        },
+        attributes: ['first_name', 'last_name', 'class'],
         where: { class: { [Op.like]: `%${StudentClass}%` }}
-    }).catch(err => {
+    })
+    .then(data => {  res.send(data) })
+    .catch(err => {
         res.status(500).send({
             status: "Error",
             status_code: 101,
