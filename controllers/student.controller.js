@@ -279,3 +279,31 @@ exports.DeleteStudentSQL = async(req, res) => {
         });
     }
 };
+
+// retreive all students in a specific class
+exports.FindStudentsInClass = (req, res) => {
+    const { StudentClass } = req.body;
+    let vmsg='';
+
+    if(StudentClass === null){
+        vmsg = `No class, or invalid class specified. Please specify one of: S1, S2, S3, S4, S5 or S6.`
+    }
+
+    if( vmsg!==""){
+        res.status(400).send({ message: `${vmsg}` });
+        return;
+    }
+
+    Student.findAll({
+        attributes: {
+            include: ['first_name', 'last_name']
+        },
+        where: { class: { [Op.like]: `%${StudentClass}%` }}
+    }).catch(err => {
+        res.status(500).send({
+            status: "Error",
+            status_code: 101,
+            message: err.message || "Error occured while retrieving students"
+        });
+    });
+}

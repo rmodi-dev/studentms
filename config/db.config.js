@@ -1,5 +1,5 @@
 module.exports = {
-    HOST: "46.101.198.244", //hostname
+    HOST: "localhost", //hostname
     USER: "rmodi", //username
     PASSWORD: "password1", //user password
     DB: "rmodi", //database name

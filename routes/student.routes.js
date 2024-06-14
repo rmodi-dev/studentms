@@ -13,6 +13,7 @@ module.exports = app => {
     router.post("/create", student_controller.CreateStudent);
     router.delete("/delete", student_controller.DeleteStudentSQL);
     router.get("/search", student_controller.SearchStudent);
+    router.get("/find_by_class", student_controller.FindStudentsInClass);
 
     //Defining API Root URL
     app.use('/api/students', router);
