@@ -9,9 +9,13 @@ function ProcessFeesSchedule(fees_schedule) {
         };
         feespayments.push(paid);
     });
+    
+    return total_paid; 
+    
+    /*
     return {
         total: total_paid,
         payments: { ...feespayments }
-    };
+    }; */
 }
 exports.ProcessFeesSchedule = ProcessFeesSchedule;

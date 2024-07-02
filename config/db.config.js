@@ -1,8 +1,8 @@
 module.exports = {
     HOST: "localhost", //hostname
-    USER: "rmodi", //username
+    USER: "root", //username
     PASSWORD: "password1", //user password
-    DB: "rmodi", //database name
+    DB: "studentms1", //database name
     dialect: "mysql",
     pool: {        
         max: 5, //max no of connections in pool        
